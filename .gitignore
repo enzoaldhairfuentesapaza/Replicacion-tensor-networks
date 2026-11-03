@@ -1,0 +1,10 @@
+﻿
+# Respaldos y archivos temporales
+*.bak
+*.tmp
+__pycache__/
+*.pyc
+
+# Entornos locales
+.venv/
+venv/
