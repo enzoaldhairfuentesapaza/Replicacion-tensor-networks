@@ -1,9 +1,20 @@
 # Replicación de simulación cuántica con redes de tensores
 
-Evaluación en CPU de los algoritmos GN y ComPar del artículo de Pastor, Badia y Castillo:
-[A community detection-based parallel algorithm for quantum circuit simulation using tensor networks](https://doi.org/10.1007/s11227-025-06918-3).
+Este repositorio contiene la implementación del algoritmo de contracción multietapa (`ComPar`) diseñado para la simulación eficiente de circuitos cuánticos. El algoritmo aprovecha los métodos de contracción de redes tensoriales paralelas para representar y calcular circuitos cuánticos complejos de manera eficiente.
 
-Replicación experimental: Enzo Aldhair Fuentes Apaza.
+El desarrollo original se basa en el [paquete QXTools para Julia](https://juliaqx.github.io/QXTools.jl). QXTools es un marco de código abierto que facilita la creación, manipulación y simulación de redes tensoriales asociadas a circuitos cuánticos. Integra bibliotecas de última generación para operaciones tensoriales y admite técnicas avanzadas de paralelización tanto en CPU como en GPU.
+
+El trabajo original describe varias variantes del algoritmo multietapa, que aprovechan tanto los multiprocesadores multinúcleo como las GPU para la contracción paralela de tensores. Estas variantes corresponden a los algoritmos y experimentos descritos en el artículo. La evaluación realizada en esta replicación cubre por ahora las variantes CPU; GPU y slicing/MPI quedan pendientes.
+
+## Autores y referencia original
+
+El algoritmo ComPar y la implementación base son trabajo de **Alfred M. Pastor, Jose M. Badia y Maribel Castillo**. Este repositorio parte de su [repositorio original Multistage_contraction](https://github.com/alfred-miquel/Multistage_contraction), conservando sus licencias y atribución.
+
+**Referencia:** Pastor, A. M., Badia, J. M., Castillo, M. I. (2025). *A community detection-based parallel algorithm for quantum circuit simulation using tensor networks*. The Journal of Supercomputing, 81, 450. https://doi.org/10.1007/s11227-025-06918-3
+
+Título en español: «Un algoritmo paralelo basado en la detección de comunidades para la simulación de circuitos cuánticos utilizando redes tensoriales».
+
+**Replicación experimental:** Enzo Aldhair Fuentes Apaza. Las aportaciones de esta replicación comprenden la configuración del entorno, los scripts de validación y medición, las gráficas y la documentación de los experimentos GHZ, QFT y RQC en CPU.
 
 ## Organización
 
