@@ -1,121 +1,108 @@
+# Replicación de simulación cuántica con redes de tensores
 
-# Multistage Contraction Algorithm Repository
+Evaluación en CPU de los algoritmos GN y ComPar del artículo de Pastor, Badia y Castillo:
+[A community detection-based parallel algorithm for quantum circuit simulation using tensor networks](https://doi.org/10.1007/s11227-025-06918-3).
 
-This repository contains the implementation of the multistage contraction algorithm (`ComPar`) designed for the efficient simulation of quantum circuits. The algorithm leverages parallel tensor network contraction methods to represent and compute complex quantum circuits efficiently. 
+Replicación experimental: Enzo Aldhair Fuentes Apaza.
 
-The development of this repository is based on the [QXTools package for Julia](https://juliaqx.github.io/QXTools.jl). QXTools is an open-source framework that facilitates the creation, manipulation, and simulation of tensor networks associated with quantum circuits. It integrates state-of-the-art libraries for tensor operations and supports advanced parallelization techniques on both CPUs and GPUs.
+## Organización
 
-The repository includes several variants of the multistage algorithm, leveraging both multicore multiprocessors and GPUs for parallel tensor contraction. These implementations align with the algorithms and results described in the article.
+| Carpeta | Contenido |
+| --- | --- |
+| `src/` | Implementación original de los autores |
+| `Notebooks/` | Notebooks originales |
+| `experimentos/` | Una configuración por ejecución para GHZ, QFT o RQC |
+| `graficas/` | Generación de resúmenes y gráficas a partir de los CSV |
+| `resultados/<familia>/datos/` | Mediciones individuales |
+| `resultados/<familia>/graficas/` | Resúmenes CSV y figuras PNG/PDF |
+| `docs/avances/` | Registro de los avances experimentales |
+| `docs/historico/` | README original de los autores |
+| `historico/` | Script exploratorio y mediciones iniciales |
 
-**Reference**: Pastor, A. M., Badia, J. M., Castillo, M. I. (2025). A Community Detection-Based Parallel Algorithm for Quantum Circuit Simulation Using Tensor Networks. *The Journal of Supercomputing*.
+## Entorno
 
-## Contents
+Se utilizó Windows 11, Ryzen 5 5600H, 8 GB de RAM, Julia 1.7.3 y Python 3.10.11.
+Las versiones de paquetes están en `Manifest.toml` y `requirements-python.txt`.
 
-### `src`
-The `src` directory contains the core implementation of the multistage contraction algorithm. This includes:
+Desde la raíz del repositorio, instalar las dependencias de Julia:
 
-- The multistage algorithm described in the article.
-- Variants using different parallelization strategies for tensor contraction on multicore processors and GPUs.
+```powershell
+& "D:\ENZO\Herramientas\julia-1.7.3\bin\julia.exe" --project=.
+```
 
-### Jupyter Notebooks
-Three commented Jupyter notebooks are provided to test the algorithms and replicate experimental results included in the article. These notebooks guide users through setting up and running the experiments step by step.
-
-## Prerequisites
-
-To test the code, ensure the following software is installed:
-
-1. **Julia**
-   - Download and install Julia from [https://julialang.org/](https://julialang.org/).
-
-2. **Python** (for running the Jupyter notebooks)
-   - Install Python from [https://www.python.org/](https://www.python.org/).
-   - Install Jupyter Notebook by running:
-     ```bash
-     pip install notebook
-     ```
-
-> **Note:** There is no need to preinstall QXTools or other related packages. The required packages can be installed interactively within the Julia environment when running the code or via the provided Jupyter notebooks.
-
-## Quick Start Example
-
-Here is a simple "Hello World" example to run the `ComPar` algorithm on a GHZ circuit of a specific size, using a multicore CPU in all stages.
-
-### Julia Code Example
+Dentro de Julia:
 
 ```julia
-# Add necessary packages
-import Pkg; 
-Pkg.add("QXTools")
-Pkg.add("QXGraphDecompositions")
-Pkg.add("QXZoo")
-Pkg.add("DataStructures")
-Pkg.add("QXTns")
-Pkg.add("NDTensors")
-Pkg.add("ITensors")
-Pkg.add("LightGraphs")
-Pkg.add("PyCall")
-
-
-# Using required modules
-using QXTools
-using QXTns
-using QXZoo
-using PyCall
-using QXGraphDecompositions
-using LightGraphs
-using DataStructures
-using TimerOutputs
-using ITensors
-using LinearAlgebra
-using NDTensors
-
-# Load custom functions from the folder src
-include("../src/funcions_article.jl");
-
-# Create a GHZ circuit with 10 qubits
-circuit = create_ghz_circuit(10)
-
-# Convert the circuit to a tensor network circuit (TNC)
-tnc = convert_to_tnc(circuit)
-
-# Configure the contraction algorithm
-num_communities = 4  # Number of communities for the multistage algorithm
-input_state = "0" ^ 10  # All qubits initialized to 0
-output_state = "1" ^ 10 # Target output state
-
-# Run the ComPar algorithm using multicore CPU
-result = ComParCPU(circuit, input_state, output_state, num_communities;
-                    timings=true, decompose=true)
-
-# Print results
-println("Contraction completed. Results:")
-println(result)
+using Pkg
+Pkg.instantiate()
 ```
 
-### Running the Code
-Save the above code in a file, e.g., `run_example.jl`. Then, run the file from the Julia REPL, using the -t auto option to be able to use threads:
+Preparar Python, si aún no existe el entorno:
 
-```bash
-julia -t auto run_example.jl
+```powershell
+& "D:\ENZO\Herramientas\Python310\python.exe" -m venv D:\ENZO\Herramientas\python_compar
+& "D:\ENZO\Herramientas\python_compar\Scripts\python.exe" -m pip install -r requirements-python.txt
 ```
 
-## Using Jupyter Notebooks
+Para enlazar PyCall, ejecutar en Julia y reiniciar después:
 
-To explore the algorithms further, open one of the provided notebooks:
+```julia
+using Pkg
+ENV["PYTHON"] = raw"D:\ENZO\Herramientas\python_compar\Scripts\python.exe"
+Pkg.build("PyCall")
+```
 
-1. Navigate to the `notebooks` directory.
-2. Launch the Jupyter Notebook server:
-   ```bash
-   jupyter notebook
-   ```
-   Although you can use ```IJulia``` from Julia REPL. Please visit [here](https://julialang.github.io/IJulia.jl/stable/manual/installation/):
-   ```
-   using IJulia
-   notebook()
-    ```
-    This action launchs the IJulia notebook in your browser.
-4. Open a notebook and follow the instructions provided.
+Los scripts reconocen por defecto los paquetes de ese entorno. En otro equipo se puede indicar la carpeta:
 
----
+```powershell
+$env:COMPAR_PYTHON_PACKAGES = "D:\ENZO\Herramientas\python_compar\Lib\site-packages"
+```
 
-We hope this repository provides valuable resources for exploring and experimenting with the multistage contraction algorithms!
+## Ejecutar un ejemplo
+
+Todos los comandos se ejecutan desde la raíz. Cada archivo evalúa una sola configuración; realiza calentamiento y varias repeticiones para calcular la mediana.
+
+```powershell
+& "D:\ENZO\Herramientas\julia-1.7.3\bin\julia.exe" --project=. --threads=4 .\experimentos\comparar_ghz.jl
+& "D:\ENZO\Herramientas\julia-1.7.3\bin\julia.exe" --project=. --threads=4 .\experimentos\comparar_qft.jl
+& "D:\ENZO\Herramientas\julia-1.7.3\bin\julia.exe" --project=. --threads=4 .\experimentos\comparar_rqc.jl
+```
+
+| Script | Ejemplo predeterminado | Argumentos opcionales |
+| --- | --- | --- |
+| GHZ | 10 qubits, comunidades automáticas | `qubits` |
+| QFT | 6 qubits, 2 comunidades | `qubits comunidades` |
+| RQC | 3×3, profundidad 8, 4 comunidades, semilla 42 | `lado profundidad comunidades` |
+
+Por ejemplo, `comparar_rqc.jl 4 16 8` evalúa únicamente esa configuración.
+GHZ y QFT utilizan diez repeticiones; RQC utiliza cinco. BLAS utiliza un hilo.
+Una nueva ejecución reemplaza el CSV de la misma configuración.
+
+## Generar gráficas
+
+```powershell
+& "D:\ENZO\Herramientas\python_compar\Scripts\python.exe" .\graficas\graficar_ghz.py
+& "D:\ENZO\Herramientas\python_compar\Scripts\python.exe" .\graficas\graficar_qft.py
+& "D:\ENZO\Herramientas\python_compar\Scripts\python.exe" .\graficas\graficar_rqc.py
+```
+
+Estos programas resumen las mediciones existentes, sin ejecutar nuevos circuitos. Actualmente filtran cuatro hilos y, para RQC, semilla 42.
+
+## Alcance y resultados
+
+Se validaron GHZ hasta 999 qubits, QFT hasta 18 y RQC hasta cuadrículas 4×4 con profundidades 8 y 16.
+La serie GHZ final alcanzó 16.289× frente a GN para 999 qubits. QFT de 18 qubits con ocho comunidades obtuvo 2.172×. RQC tuvo mejoras y un caso pequeño ligeramente más lento con ComPar.
+
+Los tiempos incluyen preparación, planificación y contracción; excluyen inicio del proceso, carga inicial de paquetes y creación del circuito. La referencia GN adapta el código original para fijar entrada, salida y descomposición.
+QFT incluye las dos CNOT adicionales de la función de los autores.
+RQC valida consistencia entre GN, min-fill y ComPar; no utiliza un simulador independiente de vector de estado.
+
+Las asignaciones de memoria son acumuladas de Julia, no memoria máxima ocupada. Los resultados corresponden a esta laptop y las configuraciones registradas. GPU y slicing/MPI quedan pendientes.
+
+## Procedencia
+
+Código base: https://github.com/alfred-miquel/Multistage_contraction
+
+Commit original: `b05dcb39a919cb411b494b1ec382c7f7e84babc2`.
+Se conservan el historial, `LICENSE`, `GPL.txt` y el [README original](docs/historico/README_original.md).
+Los documentos de `docs/avances/` conservan los nombres y rutas mencionados durante cada etapa; la estructura vigente es la de este README.
